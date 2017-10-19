@@ -5,6 +5,10 @@ import com.spring.model.User;
 import com.spring.service.inter.UserServiceInter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
+
+import java.io.*;
+import java.util.List;
 
 /********************************************
  * 文件名称: UserServiceImpl
@@ -22,7 +26,58 @@ public class UserServiceImpl implements UserServiceInter {
     @Autowired
     private UserDao userdDao;
     @Override
-    public User selectUser(long userId) {
-        return this.userdDao.selectUser(userId);
+    public User selectUser(String userId) {
+        //连接本地redis服务
+        User user = null;
+        Object obj = null;
+        Jedis jedis = new Jedis("localhost");
+        //进行redis判断 redis中有指定数据 直接返回 否则执行后续查询操作
+        byte[] byt = jedis.get(userId.getBytes());
+        if(byt != null){
+            //对象反序列化
+             obj = unserizlize(byt);
+            if(obj instanceof User){
+                return (User)obj ;
+            }
+        }
+        else{
+            user = userdDao.selectUser(userId);
+            //将user对象存入redis 需序列化
+            jedis.set(userId.getBytes(),serialize(user));
+        }
+        return user;
+    }
+    //序列化
+    public static byte [] serialize(Object obj){
+        ObjectOutputStream obi=null;
+        ByteArrayOutputStream bai=null;
+        try {
+            bai=new ByteArrayOutputStream();
+            obi=new ObjectOutputStream(bai);
+            obi.writeObject(obj);
+            byte[] byt=bai.toByteArray();
+            return byt;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //反序列化
+    public static Object unserizlize(byte[] byt){
+        ObjectInputStream oii=null;
+        ByteArrayInputStream bis=null;
+        bis=new ByteArrayInputStream(byt);
+        try {
+            oii=new ObjectInputStream(bis);
+            Object obj=oii.readObject();
+            return obj;
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+
+        return null;
     }
 }

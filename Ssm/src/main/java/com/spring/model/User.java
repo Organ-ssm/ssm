@@ -1,5 +1,6 @@
 package com.spring.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /********************************************
@@ -15,8 +16,8 @@ import java.util.Date;
  * 相关文档: 
  * 修改记录: 版本信息  修改标签  修改人员  修改说明  修改单编号
  *********************************************/
-public class User {
-    private long id;
+public class User implements Serializable{
+    private String id;
     private String email;
     private String password;
     private String username;
@@ -25,11 +26,11 @@ public class User {
     private Date regTime;
     private String regIp;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

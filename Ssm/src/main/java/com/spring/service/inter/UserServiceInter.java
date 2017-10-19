@@ -10,5 +10,5 @@ public interface UserServiceInter {
      * @param userId
      * @return
      */
-    public User selectUser(long userId);
+    public User selectUser(String userId);
 }
