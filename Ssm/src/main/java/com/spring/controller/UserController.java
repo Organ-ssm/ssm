@@ -36,7 +36,7 @@ public class UserController {
     public void selectUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        long userId = Long.parseLong(request.getParameter("id"));
+        String userId = request.getParameter("id");
         User user = this.userServiceImpl.selectUser(userId);
         ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(user));
